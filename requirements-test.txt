@@ -1,0 +1,9 @@
+-r requirements.txt
+coverage
+coveralls
+django-app-helper>=2.0.0a2
+tox>=1.9
+wheel
+sphinx-autobuild
+sphinx
+sphinx-rtd-theme

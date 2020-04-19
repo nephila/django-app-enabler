@@ -1,0 +1,5 @@
+include AUTHORS.rst
+include HISTORY.rst
+include README.rst
+include LICENSE
+recursive-include app_enabler *.html *.png *.gif *js *jpg *jpeg *svg *py *css *po *mo *html *eot *svg *ttf *woff *swf

@@ -1,0 +1,8 @@
+.. _usage:
+
+#####
+Usage
+#####
+
+Something
+
