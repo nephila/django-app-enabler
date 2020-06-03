@@ -1,5 +1,5 @@
 -r requirements.txt
-coverage
+coverage==5.1
 coveralls
 django-app-helper>=2.0.0a2
 tox>=1.9
