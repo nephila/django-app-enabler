@@ -3,7 +3,7 @@ coverage==5.1
 coveralls==2.0.0
 django-app-helper>=2.0.0a2
 tox>=1.9
-wheel
+wheel==0.34.2
 sphinx-autobuild
 sphinx
 sphinx-rtd-theme
