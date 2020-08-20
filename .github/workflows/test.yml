@@ -9,15 +9,12 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8, 3.7, 3.6, 3.5]
-        django: [31,30, 22]
-        sekizai: [sekizai,nosekizai]
+        django: [31, 30, 22]
         exclude:
           - python-version: 3.5
             django: 30
           - python-version: 3.5
             django: 31
-          - django: 31
-            sekizai: sekizai
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -35,16 +32,16 @@ jobs:
       uses: actions/cache@v1
       with:
         path: .tox
-        key: ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-cms{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-${{ hashFiles('setup.cfg') }}
+        key: ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}}}', matrix.python-version, matrix.django) }}-${{ hashFiles('setup.cfg') }}
         restore-keys: |
-          ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}-cms{2}}}', matrix.python-version, matrix.django, matrix.cms) }}-
+          ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}}}', matrix.python-version, matrix.django) }}-
     - name: Install dependencies
       run: |
         sudo apt-get install gettext
         python -m pip install --upgrade pip tox>=3.5
     - name: Test with tox
       env:
-        TOX_ENV: ${{ format('py-django{1}-{2}', matrix.python-version, matrix.django, matrix.sekizai) }}
+        TOX_ENV: ${{ format('py-django{1}', matrix.python-version, matrix.django) }}
         COMMAND: coverage run
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_SERVICE_NAME: github

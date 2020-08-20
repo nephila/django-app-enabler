@@ -1,6 +1,7 @@
 import ast
 import sys
 from types import CodeType
+from typing import Any, Dict
 
 import astor
 import django
@@ -28,6 +29,11 @@ def monkeypatch_manage(manage_file: str) -> CodeType:
     Patch manage.py to be executable without actually running any command.
 
     By using ast we remove the "execute_from_command_line" call and add an unconditional call to the main function.
+
+    :param manage_file: path to manage.py file
+    :type manage_file: str
+    :return: patched manage.py code
+    :rtype: CodeType
     """
     parsed = astor.parse_file(manage_file)
     modified = DisableExecute().visit(parsed)
@@ -45,7 +51,7 @@ class DisableExecute(ast.NodeTransformer):
 
     def visit_Expr(self, node: ast.AST) -> Any:  # noqa
         """Visit the Expr node and remove it if it matches execute_from_command_line."""
-        # long chained checks, but wehave to remove the entire call, thus w have to remove the Expr node
+        # long chained checks, but we have to remove the entire call, thus w have to remove the Expr node
         if (
             isinstance(node.value, ast.Call)
             and isinstance(node.value.func, ast.Name)  # noqa
@@ -56,16 +62,16 @@ class DisableExecute(ast.NodeTransformer):
             return node
 
 
-def update_setting(project_setting, config):
+def update_setting(project_setting: str, config: Dict[str, str]):
     """
     Patch the settings module to include addon settings.
 
     Original file is overwritten. As file is patched using AST, original comments and file structure is lost.
 
-    :param project_setting: project urls.py file path
-    :type projectproject_setting_urls: str
+    :param project_setting: project settings file path
+    :type project_setting: str
     :param config: addon setting parameters
-    :type config: str
+    :type config: Dict
     """
     parsed = astor.parse_file(project_setting)
     existing_setting = []
@@ -86,7 +92,7 @@ def update_setting(project_setting, config):
         settings.write(src)
 
 
-def update_urlconf(project_urls: str, config: dict):
+def update_urlconf(project_urls: str, config: Dict[str, str]):
     """
     Patch the ROOT_URLCONF module to include addon url patterns.
 
@@ -95,7 +101,7 @@ def update_urlconf(project_urls: str, config: dict):
     :param project_urls: project urls.py file path
     :type project_urls: str
     :param config: addon urlconf configuration
-    :type config: str
+    :type config: Dict[str, str]
     """
     parsed = astor.parse_file(project_urls)
 

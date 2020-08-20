@@ -4,10 +4,30 @@
 API
 ***
 
+*******
+CLI
+*******
 
-.. toctree::
-   :maxdepth: 3
+.. automodule:: app_enabler.__main__
+    :members:
+    :private-members:
 
-   settings
-   models
-   views
+.. automodule:: app_enabler.main
+    :members:
+    :private-members:
+
+*******
+Loaders
+*******
+
+.. automodule:: app_enabler.django
+    :members:
+    :private-members:
+
+********
+Patchers
+********
+
+.. automodule:: app_enabler.patcher
+    :members:
+    :private-members:
