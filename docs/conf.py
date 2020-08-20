@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Nephila Widgets documentation build configuration file, created by
 # sphinx-quickstart on Fri Apr  3 07:09:59 2015.
@@ -16,29 +15,19 @@
 import os
 import sys
 
-import sphinx.environment
-
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 import sphinx_rtd_theme
-from docutils.utils import get_source_line
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath(".."))
-import cms_helper  # isort:skip
-import app_enabler  # isort:skip
+import cms_helper  # isort:skip  # noqa: E402
+import app_enabler  # isort:skip  # noqa: E402
 
 cms_helper.setup()
 
-
-def _warn_node(self, msg, node, *args, **kwargs):
-    if not msg.startswith("nonlocal image URI found:"):
-        self._warnfunc(msg, "%s:%s" % get_source_line(node))
-
-
-sphinx.environment.BuildEnvironment.warn_node = _warn_node
 
 # -- General configuration ------------------------------------------------
 
@@ -71,7 +60,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "App Enabler"
-copyright = "2015, Nephila"
+copyright = "2015, Nephila"  # noqa: A001
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -210,11 +199,11 @@ htmlhelp_basename = "app_enabler"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
+    # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
+    # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
+    # 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

@@ -13,6 +13,7 @@ def run():
 
 def setup():
     import sys
+
     from app_helper import runner
 
     runner.setup("app_enabler", sys.modules[__name__])

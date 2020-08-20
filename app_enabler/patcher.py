@@ -19,9 +19,7 @@ def setup_django():
         eval(managed_command)
         django.setup()
     except FileNotFoundError:
-        print(
-            "app-enabler must be execute in the same directory as the project manage.py file"
-        )
+        print("app-enabler must be execute in the same directory as the project manage.py file")
         sys.exit(1)
 
 
@@ -35,13 +33,7 @@ def monkeypatch_manage(manage_file: str) -> CodeType:
     modified = DisableExecute().visit(parsed)
     # patching the module with the call to the main function as the standard one is not executed because
     # __name__ != '__main__'
-    modified.body.append(
-        ast.Expr(
-            value=ast.Call(
-                func=ast.Name(id="main", ctx=ast.Load()), args=[], keywords=[]
-            )
-        )
-    )
+    modified.body.append(ast.Expr(value=ast.Call(func=ast.Name(id="main", ctx=ast.Load()), args=[], keywords=[])))
     fixed = ast.fix_missing_locations(modified)
     return compile(fixed, "<string>", mode="exec")
 
@@ -80,22 +72,13 @@ def update_setting(project_setting, config):
     for node in parsed.body:
         if isinstance(node, ast.Assign) and node.targets[0].id == "INSTALLED_APPS":
             installed_apps = [name.s for name in node.value.elts]
-            addon_apps = [
-                ast.Constant(app)
-                for app in config["installed-apps"]
-                if app not in installed_apps
-            ]
+            addon_apps = [ast.Constant(app) for app in config["installed-apps"] if app not in installed_apps]
             node.value.elts.extend(addon_apps)
-        elif (
-            isinstance(node, ast.Assign)
-            and node.targets[0].id in config["settings"].keys()  # noqa
-        ):
+        elif isinstance(node, ast.Assign) and node.targets[0].id in config["settings"].keys():  # noqa
             existing_setting.append(node.targets[0].id)
     for name, value in config["settings"].items():
         if name not in existing_setting:
-            parsed.body.append(
-                ast.Assign(targets=[ast.Name(id=name)], value=ast.Constant(value))
-            )
+            parsed.body.append(ast.Assign(targets=[ast.Name(id=name)], value=ast.Constant(value)))
 
     src = astor.to_source(parsed)
 

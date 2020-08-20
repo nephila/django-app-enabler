@@ -3,7 +3,7 @@ App Enabler
 ##########################
 
 
-|Gitter| |PyPiVersion| |PyVersion| |Status| |TestCoverage| |CodeClimate| |License|
+|Gitter| |PyPiVersion| |PyVersion| |GAStatus| |TestCoverage| |CodeClimate| |License|
 
 
 ============
@@ -22,7 +22,7 @@ a real benefit.
 Key points
 ----------
 
-* zero-knowledge tool to configure django applications in a django project
+* zero-knowledge tool to enable and configure django applications in a django project
 * ``django-app-enabler`` will never be a package manager / replacement for pip/poetry/pipenv
 * rely on specification file shipped by the target application to patch django project configuration
 
@@ -104,9 +104,9 @@ features and support level and must be documented by the application itself.
     :target: https://pypi.python.org/pypi/django-app-enabler
     :alt: Python versions
 
-.. |Status| image:: https://img.shields.io/travis/com/nephila/django-app-enabler.svg?style=flat-square
-    :target: https://travis-ci.com/github/nephila/django-app-enabler
-    :alt: Latest Travis CI build status
+.. |GAStatus| image:: https://github.com/nephila/django-app-enabler/workflows/Tox%20tests/badge.svg
+    :target: https://github.com/nephila/django-app-enabler
+    :alt: Latest CI build status
 
 .. |TestCoverage| image:: https://img.shields.io/coveralls/nephila/django-app-enabler/master.svg?style=flat-square
     :target: https://coveralls.io/r/nephila/django-app-enabler?branch=master

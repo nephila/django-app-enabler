@@ -3,7 +3,7 @@ branch = True
 source = app_enabler
 
 [report]
-omit = *migrations*,*tests*,*compat*,*widgets_import_old_app*
+omit = *migrations*,*tests*,*test_utils*
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
@@ -20,7 +20,7 @@ exclude_lines =
     # Don't complain if non-runnable code isn't run:
     if 0:
     if __name__ == .__main__.:
-precision = 2
+
 ignore_errors = True
 
 [html]
