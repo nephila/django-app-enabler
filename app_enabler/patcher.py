@@ -5,7 +5,8 @@ from types import CodeType
 from typing import Any, Dict
 
 import astor
-import django
+
+from .errors import messages
 
 
 def setup_django():
@@ -16,12 +17,14 @@ def setup_django():
 
     Manage.py is monkeypatched in memory to remove the call "execute_from_command_line" and executed from memory.
     """
+    import django
+
     try:
         managed_command = monkeypatch_manage("manage.py")
         eval(managed_command)
         django.setup()
     except FileNotFoundError:
-        print("app-enabler must be execute in the same directory as the project manage.py file")
+        sys.stderr.write(messages["no_managepy"])
         sys.exit(1)
 
 
@@ -35,6 +38,7 @@ def monkeypatch_manage(manage_file: str) -> CodeType:
     :return: patched manage.py code
     """
     parsed = astor.parse_file(manage_file)
+    # first patch run replace __name__ != '__main__' with a function call
     modified = DisableExecute().visit(parsed)
     # patching the module with the call to the main function as the standard one is not executed because
     # __name__ != '__main__'
@@ -50,7 +54,7 @@ class DisableExecute(ast.NodeTransformer):
 
     def visit_Expr(self, node: ast.AST) -> Any:  # noqa
         """Visit the Expr node and remove it if it matches execute_from_command_line."""
-        # long chained checks, but we have to remove the entire call, thus w have to remove the Expr node
+        # long chained checks, but we have to remove the entire call, thus we have to remove the Expr node
         if (
             isinstance(node.value, ast.Call)
             and isinstance(node.value.func, ast.Name)  # noqa
@@ -78,6 +82,13 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
             addon_apps = [ast.Constant(app) for app in config["installed-apps"] if app not in installed_apps]
             node.value.elts.extend(addon_apps)
         elif isinstance(node, ast.Assign) and node.targets[0].id in config["settings"].keys():  # noqa
+            config_param = config["settings"][node.targets[0].id]
+            if isinstance(node.value, ast.List) and (
+                isinstance(config_param, list) or isinstance(config_param, tuple)
+            ):
+                # breakpoint()
+                for config_value in config_param:
+                    node.value.elts.append(ast.Str(config_value))
             existing_setting.append(node.targets[0].id)
     for name, value in config["settings"].items():
         if name not in existing_setting:
@@ -101,7 +112,9 @@ def update_urlconf(project_urls: str, config: Dict[str, Any]):
     parsed = astor.parse_file(project_urls)
 
     for node in parsed.body:
-        if isinstance(node, ast.Assign) and node.targets[0].id == "urlpatterns":
+        if isinstance(node, ast.ImportFrom) and node.module == "django.urls":
+            node.names.append(ast.alias(name="include", asname=None))
+        elif isinstance(node, ast.Assign) and node.targets[0].id == "urlpatterns":
             existing_url = []
             for url_line in node.value.elts:
                 calls = [

@@ -39,7 +39,7 @@ See `usage`_ for more details.
 Compatible packages
 -------------------
 
-`Up-to-date list of compatible packages <packages>`_
+`Up-to-date list of compatible packages`_
 
 .. |Gitter| image:: https://img.shields.io/badge/GITTER-join%20chat-brightgreen.svg?style=flat-square
     :target: https://gitter.im/nephila/applications
@@ -70,5 +70,5 @@ Compatible packages
    :alt: Code Climate
 
 
-.. _usage: https://django-app-enabler.readthedocs.io/usage/
-.. _packages: https://pypi.org/search/?q="django-app-enabler+addon"
+.. _usage: https://django-app-enabler.readthedocs.io/en/latest/usage.html
+.. _Up-to-date list of compatible packages: https://pypi.org/search/?q="django-app-enabler+addon"

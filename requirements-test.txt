@@ -2,3 +2,5 @@
 coverage
 coveralls>=2.0
 django-app-helper>=2.0.0
+pytest
+pytest-cov
