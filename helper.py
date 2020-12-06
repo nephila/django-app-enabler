@@ -2,7 +2,10 @@
 
 from tempfile import mkdtemp
 
-HELPER_SETTINGS = dict(INSTALLED_APPS=["app_enabler"], FILE_UPLOAD_TEMP_DIR=mkdtemp(),)
+HELPER_SETTINGS = dict(
+    INSTALLED_APPS=["app_enabler"],
+    FILE_UPLOAD_TEMP_DIR=mkdtemp(),
+)
 
 
 def run():
@@ -22,6 +25,6 @@ def setup():
 if __name__ == "__main__":
     run()
 
-if __name__ == "cms_helper":
+if __name__ == "helper":
     # this is needed to run cms_helper in pycharm
     setup()

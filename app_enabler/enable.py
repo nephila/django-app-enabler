@@ -4,12 +4,12 @@ from .django import get_settings_path, get_urlconf_path, load_addon
 from .patcher import setup_django, update_setting, update_urlconf
 
 
-def enable(application: str):
+def enable(application: str, verbose: bool = False):
     """
-    Enable given application.
+    Enable django application in the current project
 
-    :param application: python module name to enable. It must be the name of a Django application.
-    :type application: str
+    :param str application: python module name to enable. It must be the name of a Django application.
+    :param bool verbose: Verbose output
     """
     setup_django()
 
