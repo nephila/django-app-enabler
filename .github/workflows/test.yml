@@ -8,13 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.7, 3.6, 3.5]
+        python-version: [3.9, 3.8, 3.7, 3.6]
         django: [31, 30, 22]
-        exclude:
-          - python-version: 3.5
-            django: 30
-          - python-version: 3.5
-            django: 31
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
