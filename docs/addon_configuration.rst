@@ -9,6 +9,8 @@ Addon configuration specification
 
 See :ref:`limitations` for limitations and caveats.
 
+.. _addon_json:
+
 ***********
 addon.json
 ***********
