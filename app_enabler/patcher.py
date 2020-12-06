@@ -1,4 +1,5 @@
 import ast
+import os  # noqa - used when eval'ing the management command
 import sys
 from types import CodeType
 from typing import Any, Dict
@@ -30,10 +31,8 @@ def monkeypatch_manage(manage_file: str) -> CodeType:
 
     By using ast we remove the "execute_from_command_line" call and add an unconditional call to the main function.
 
-    :param manage_file: path to manage.py file
-    :type manage_file: str
+    :param str manage_file: path to manage.py file
     :return: patched manage.py code
-    :rtype: CodeType
     """
     parsed = astor.parse_file(manage_file)
     modified = DisableExecute().visit(parsed)
@@ -46,7 +45,7 @@ def monkeypatch_manage(manage_file: str) -> CodeType:
 
 class DisableExecute(ast.NodeTransformer):
     """
-    Patch the managepy module to remove the execute_from_command_line execution.
+    Patch the manage.py module to remove the execute_from_command_line execution.
     """
 
     def visit_Expr(self, node: ast.AST) -> Any:  # noqa
@@ -62,16 +61,14 @@ class DisableExecute(ast.NodeTransformer):
             return node
 
 
-def update_setting(project_setting: str, config: Dict[str, str]):
+def update_setting(project_setting: str, config: Dict[str, Any]):
     """
     Patch the settings module to include addon settings.
 
     Original file is overwritten. As file is patched using AST, original comments and file structure is lost.
 
-    :param project_setting: project settings file path
-    :type project_setting: str
-    :param config: addon setting parameters
-    :type config: Dict
+    :param str project_setting: project settings file path
+    :param dict config: addon setting parameters
     """
     parsed = astor.parse_file(project_setting)
     existing_setting = []
@@ -92,16 +89,14 @@ def update_setting(project_setting: str, config: Dict[str, str]):
         settings.write(src)
 
 
-def update_urlconf(project_urls: str, config: Dict[str, str]):
+def update_urlconf(project_urls: str, config: Dict[str, Any]):
     """
     Patch the ROOT_URLCONF module to include addon url patterns.
 
     Original file is overwritten. As file is patched using AST, original comments and file structure is lost.
 
-    :param project_urls: project urls.py file path
-    :type project_urls: str
-    :param config: addon urlconf configuration
-    :type config: Dict[str, str]
+    :param str project_urls: project urls.py file path
+    :param dict config: addon urlconf configuration
     """
     parsed = astor.parse_file(project_urls)
 
@@ -118,9 +113,9 @@ def update_urlconf(project_urls: str, config: Dict[str, str]):
                 ]
                 if calls:
                     existing_url.extend(calls)
-            for url in config["urls"]:
+            for pattern, url in config.get("urls", None):
                 if url not in existing_url:
-                    part = ast.parse("url(r'^', include('%s'))" % url)
+                    part = ast.parse(f"path('{pattern}', include('{url}'))")
                     node.value.elts.append(part.body[0].value)
 
     src = astor.to_source(parsed)

@@ -6,14 +6,14 @@
 Welcome to App Enabler's documentation!
 #######################################################
 
-Contents:
-
 .. toctree::
    :maxdepth: 3
 
    readme
-   installation
    usage
+   limitations
+   addon_configuration
+   todo
    api/index
    history
 

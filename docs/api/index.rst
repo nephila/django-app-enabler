@@ -1,18 +1,22 @@
 .. _api:
 
-***
+###
 API
-***
+###
 
 *******
 CLI
 *******
 
-.. automodule:: app_enabler.__main__
+.. automodule:: app_enabler.cli
     :members:
     :private-members:
 
-.. automodule:: app_enabler.main
+.. automodule:: app_enabler.enable
+    :members:
+    :private-members:
+
+.. automodule:: app_enabler.install
     :members:
     :private-members:
 

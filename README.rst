@@ -12,7 +12,7 @@ Description
 
 PoC autoconfigurator for django applications
 
-``django-app-enabler`` goal is to reduce the configuration of a django application withing a django project a
+``django-app-enabler`` goal is to reduce the configuration of a django application to a
 one command operation to ease using django applications, both for newcomers and expert developers.
 
 As configuring a django application can be both boring (as 90% are the usual steps editing ``settings.py`` and ``urls.py``)
@@ -23,74 +23,23 @@ Key points
 ----------
 
 * zero-knowledge tool to enable and configure django applications in a django project
-* ``django-app-enabler`` will never be a package manager / replacement for pip/poetry/pipenv
 * rely on specification file shipped by the target application to patch django project configuration
+* not a replacement for existing package or dependencies managers (pip / poetry / pipenv / ...)
 
 Caveats
 -------
 
-* Project is currenly just a proof of concept
-* No stable release of any django application supporting this exists, currenty only `feature/installer-addon`_  branch of djangocms-blog support this autoconfiguration system
-* No formal specification or documentation exist for addon confguration file
-* Django project must have a single ``settings.py`` file and a single ``urls.py`` files. Currently no other layout is supported, this limitation will be removed very soon, though
+* Project is currently just a proof of concept
+* No formal specification or documentation exist (yet) for addon configuration file
+* A lot of restrictions regarding the ``settings.py`` and ``urls.py`` files are currently in place
+* Not all standard django settings options are currently supported
 
+See `usage`_ for more details.
 
-============
-Installation
-============
+Compatible packages
+-------------------
 
-``pip install https://github.com/nephila/django-app-enabler/archive/master.zip``
-
-==============
-Documentation
-==============
-
-Allow application supporting addon configurations to be configured automatically in the current django project.
-
-General concept is that once a django package is installed, this application can be run from the project root and
-the project is automatically updated with the minimal configuration required by the application to run.
-
-Applied configurations are declared by the target application in a ``addon.json`` file included in the python package.
-
-Sample file::
-
-    {
-        "package-name": "djangocms-blog",
-        "installed-apps": [
-            "filer",
-            "easy_thumbnails",
-            "aldryn_apphooks_config",
-            "parler",
-            "taggit",
-            "taggit_autosuggest",
-            "meta",
-            "djangocms_blog",
-            "sortedm2m"
-        ],
-        "settings": {
-            "META_SITE_PROTOCOL": "http",
-            "META_USE_SITES": true
-        },
-        "urls": [
-            "djangocms_blog.taggit_urls"
-        ]
-    }
-
-Sample execution flow
----------------------
-
-::
-
-    pip install djangocms-blog
-    python -mapp_enabler djangocms_blog
-    python manage.py migrate
-
-After this the django application is configured and functional.
-
-Additional configuration steps might be required according to the application
-features and support level and must be documented by the application itself.
-
-
+`Up-to-date list of compatible packages <packages>`_
 
 .. |Gitter| image:: https://img.shields.io/badge/GITTER-join%20chat-brightgreen.svg?style=flat-square
     :target: https://gitter.im/nephila/applications
@@ -121,4 +70,5 @@ features and support level and must be documented by the application itself.
    :alt: Code Climate
 
 
-.. _feature/installer-addon: https://github.com/nephila/djangocms-blog/tree/feature/installer-addon
+.. _usage: https://django-app-enabler.readthedocs.io/usage/
+.. _packages: https://pypi.org/search/?q="django-app-enabler+addon"
