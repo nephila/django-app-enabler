@@ -6,13 +6,8 @@ Addon configuration specification
 
 ``django-app-enabler`` support can be enabled by adding a :ref:`addon_json` to any django application
 (see below for the structure).
-Applications must ship conform to the following specification to be compatible with ``django-app-enabler``:
 
 See :ref:`limitations` for limitations and caveats.
-
-* they must ship an
-
-.. _addon_json:
 
 ***********
 addon.json
