@@ -24,7 +24,7 @@ def load_addon(module_name: str) -> Optional[Dict[str, Any]]:
 
 def get_settings_path(setting: "django.conf.LazySettings") -> str:
     """
-    Get the path of the django settings file from the django settings object.
+    Get the path of the django settings file path from the django settings object.
 
     :param django.conf.LazySettings setting: Django settings object
     :return: path to the settings file
@@ -35,7 +35,7 @@ def get_settings_path(setting: "django.conf.LazySettings") -> str:
 
 def get_urlconf_path(setting: "django.conf.LazySettings") -> str:
     """
-    Get the path of the django urlconf file from the django settings object.
+    Get the path of the django urlconf file path from the django settings object.
 
     :param django.conf.LazySettings setting: Django settings object
     :return: path to the settings file

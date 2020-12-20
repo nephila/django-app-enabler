@@ -12,6 +12,7 @@ from .install import get_application_from_package, install as install_fun
 @click.option("--verbose", is_flag=True)
 @click.pass_context
 def cli(context, verbose):
+    """Click entrypoint."""
     context.ensure_object(dict)
     context.obj["verbose"] = verbose
 

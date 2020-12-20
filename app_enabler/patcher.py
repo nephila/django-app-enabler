@@ -11,9 +11,13 @@ from .errors import messages
 
 def setup_django():
     """
-    Initialize the django environment by leveraging manage.py.
+    Initialize the django environment by leveraging ``manage.py``.
 
-    This works by using manage.py to set the DJANGO_SETTINGS_MODULE environment variable for django.setup to work.
+    This works by using ``manage.py`` to set the ``DJANGO_SETTINGS_MODULE`` environment variable for
+    :py:func:`django.setup() <django:django.setup>` to work as it's unknown at runtime.
+
+    This should be safer than reading the ``manage.py`` looking for the written variable as it rely on
+    Django runtime behavior.
 
     Manage.py is monkeypatched in memory to remove the call "execute_from_command_line" and executed from memory.
     """
@@ -30,9 +34,9 @@ def setup_django():
 
 def monkeypatch_manage(manage_file: str) -> CodeType:
     """
-    Patch manage.py to be executable without actually running any command.
+    Patch ``manage.py`` to be executable without actually running any command.
 
-    By using ast we remove the "execute_from_command_line" call and add an unconditional call to the main function.
+    By using ast we remove the ``execute_from_command_line`` call and add an unconditional call to the main function.
 
     :param str manage_file: path to manage.py file
     :return: patched manage.py code
@@ -49,11 +53,11 @@ def monkeypatch_manage(manage_file: str) -> CodeType:
 
 class DisableExecute(ast.NodeTransformer):
     """
-    Patch the manage.py module to remove the execute_from_command_line execution.
+    Patch the ``manage.py`` module to remove the execute_from_command_line execution.
     """
 
     def visit_Expr(self, node: ast.AST) -> Any:  # noqa
-        """Visit the Expr node and remove it if it matches execute_from_command_line."""
+        """Visit the ``Expr`` node and remove it if it matches ``'execute_from_command_line'``."""
         # long chained checks, but we have to remove the entire call, thus we have to remove the Expr node
         if (
             isinstance(node.value, ast.Call)
@@ -102,7 +106,7 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
 
 def update_urlconf(project_urls: str, config: Dict[str, Any]):
     """
-    Patch the ROOT_URLCONF module to include addon url patterns.
+    Patch the ``ROOT_URLCONF`` module to include addon url patterns.
 
     Original file is overwritten. As file is patched using AST, original comments and file structure is lost.
 
