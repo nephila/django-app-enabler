@@ -1,12 +1,12 @@
 import json
 from importlib import import_module
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import django.conf
 from pkg_resources import resource_stream
 
 
-def load_addon(module_name: str) -> Optional[dict]:
+def load_addon(module_name: str) -> Optional[Dict[str, Any]]:
     """
     Load addon configuration from json file stored in package resources.
 
