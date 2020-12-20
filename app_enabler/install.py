@@ -42,7 +42,7 @@ def get_application_from_package(package: str) -> Optional[str]:
     """
     Detect the first in alphabetical order module provided by a package.
 
-    This approach is a bit simplistic, but as we only need this to get the 'addon.json' file specified by this very
+    This approach is a bit simplistic, but as we only need this to get the ``addon.json`` file specified by this
     package, we can easily enforce this restriction.
 
     :param str package: package name (or rather its requirement string). It can be anything complying with PEP508

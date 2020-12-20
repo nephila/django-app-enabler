@@ -14,7 +14,7 @@ def _verify_settings(imported: ModuleType, application_config: Dict[str, Any]) -
     Check that addon config has been properly set in patched settings.
 
     :param ModuleType imported:  Update settings module
-    :param Dict[str, Any] application_config: addon configuration
+    :param dict application_config: addon configuration
     """
     test_passed = True
     for app in application_config["installed-apps"]:
@@ -32,16 +32,16 @@ def _verify_urlconf(imported: ModuleType, application_config: Dict[str, Any]) ->
     """
     Check that addon urlconf has been properly added in patched urlconf.
 
-    :param ModuleType imported: Update ROOT_URLCONF module
-    :param Dict[str, Any] application_config: addon configuration
-    """
 
-    # as we want to make sure urlpatterns is really tested, we check both that an existing module of the correct type
-    # is the module from addon config, and that the assert is reached for real
-    urlpatterns_checked = False
+    :param ModuleType imported: Update ``ROOT_URLCONF`` module
+    :param dict application_config: addon configuration
+    """
     # include function is added by our patcher, soo we must ensure it is available
     test_passed = bool(imported.include)
     included_urls = [url[1] for url in application_config["urls"]]
+    # as we want to make sure urlpatterns is really tested, we check both that an existing module of the correct type
+    # is the module from addon config, and that the assert is reached for real
+    urlpatterns_checked = False
     for urlpattern in imported.urlpatterns:
         if isinstance(urlpattern.urlconf_name, ModuleType):
             urlpatterns_checked = True
@@ -54,7 +54,7 @@ def verify_installation(settings: django.conf.LazySettings, application_config: 
     Verify that package installation has been successful.
 
     :param django.conf.LazySettings settings: Path to settings file
-    :param Dict[str, Any] application_config: addon configuration
+    :param dict application_config: addon configuration
     """
     try:
         del sys.modules[settings.SETTINGS_MODULE]
