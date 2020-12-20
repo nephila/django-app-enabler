@@ -32,7 +32,8 @@ def install(package: str, verbose: bool = False, pip_options: str = ""):
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         sys.stdout.write(output.decode("utf-8"))
-    except Exception as e:  # pragma: no cover
+        return True
+    except subprocess.CalledProcessError as e:  # pragma: no cover
         logger.error("cmd : {} :{}".format(e.cmd, e.output))
         raise
 
@@ -53,5 +54,5 @@ def get_application_from_package(package: str) -> Optional[str]:
         return
     try:
         return distribution.get_metadata("top_level.txt").split()[0]
-    except (FileNotFoundError, IndexError):
+    except (FileNotFoundError, IndexError):  # pragma: no cover
         return

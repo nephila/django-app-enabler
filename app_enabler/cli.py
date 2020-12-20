@@ -1,8 +1,10 @@
+import sys
 from subprocess import CalledProcessError
 
 import click
 
 from .enable import enable as enable_fun
+from .errors import messages
 from .install import get_application_from_package, install as install_fun
 
 
@@ -52,19 +54,19 @@ def install(context: click.core.Context, package: str, pip_options: str):
     try:
         install_fun(package, verbose=verbose, pip_options=pip_options)
     except CalledProcessError:
-        msg = f"Package {package} not installable in the current virtualenv"
+        msg = messages["install_error"].format(package=package)
         if verbose:
             raise RuntimeError(msg)
         else:
-            print(msg)
+            sys.stderr.write(msg)
             return
     application = get_application_from_package(package)
     if application:
         enable_fun(application, verbose=verbose)
     else:
-        msg = f"Package {package} not installed in the current virtualenv"
+        msg = messages["enable_error"].format(package=package)
         if verbose:
             raise RuntimeError(msg)
         else:
-            print(msg)
+            sys.stderr.write(msg)
             return

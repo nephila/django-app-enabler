@@ -2,7 +2,7 @@ import json
 from importlib import import_module
 from typing import Optional
 
-from django.conf import LazySettings
+import django.conf
 from pkg_resources import resource_stream
 
 
@@ -22,7 +22,7 @@ def load_addon(module_name: str) -> Optional[dict]:
         pass
 
 
-def get_settings_path(setting: LazySettings) -> str:
+def get_settings_path(setting: "django.conf.LazySettings") -> str:
     """
     Get the path of the django settings file from the django settings object.
 
@@ -33,7 +33,7 @@ def get_settings_path(setting: LazySettings) -> str:
     return settings_module.__file__
 
 
-def get_urlconf_path(setting: LazySettings) -> str:
+def get_urlconf_path(setting: "django.conf.LazySettings") -> str:
     """
     Get the path of the django urlconf file from the django settings object.
 

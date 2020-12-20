@@ -23,10 +23,7 @@ import sphinx_rtd_theme
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath(".."))
-import helper  # isort:skip  # noqa: E402
 import app_enabler  # isort:skip  # noqa: E402
-
-helper.setup()
 
 
 # -- General configuration ------------------------------------------------
@@ -291,6 +288,7 @@ intersphinx_mapping = {
 todo_include_todos = True
 
 autodoc_mock_imports = [
+    "django.conf",
     "django.utils.translation",
 ]
 autodoc_default_flags = [

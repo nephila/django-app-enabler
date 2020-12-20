@@ -6,9 +6,9 @@ Planned features
 
 * More standard django settings than INSTALLED_APPS `issue-5`_
 * Support extra-requirements `issue-6`_
-* Django settings splitted in multiple files `issue-7`_
-* Django urlconf splitted in multiple files `issue-8`_
-* Add external addon.json `issue-9`_
+* Support Django settings split in multiple files `issue-7`_
+* Support Django urlconf split in multiple files `issue-8`_
+* Add support for external addon.json `issue-9`_
 
 
 
