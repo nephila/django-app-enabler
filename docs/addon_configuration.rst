@@ -33,8 +33,8 @@ The following attributes are currently supported:
 * ``installed-apps`` [**required**]: list of django applications to be appended in the project ``INSTALLED_APPS``
   setting. Application must be already installed when the configuration is processed, thus they must declared as
   package dependencies (or depedencies of direct dependencies, even if this is a bit risky);
-* ``urls`` [**required**]: list of urlconfs to be added to the project ``ROOT_URLCONF``. List can be empty if no url
-  configuration is needed.
+* ``urls`` [optional]: list of urlconfs to be added to the project ``ROOT_URLCONF``. List can be empty if no url
+  configuration is needed or it can be omitted.
 
   Each entry in the list must be in the ``[<patten>,<include-dotted-path>]`` format:
 

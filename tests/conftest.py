@@ -76,3 +76,22 @@ def addon_config() -> Dict[str, Any]:
         "urls": [["", "djangocms_blog.taggit_urls"]],
         "message": "Please check documentation to complete the setup",
     }
+
+
+@pytest.fixture
+def addon_config_minimal() -> Dict[str, Any]:
+    """Minimal addon config."""
+    return {
+        "package-name": "djangocms-blog",
+        "installed-apps": [
+            "filer",
+            "easy_thumbnails",
+            "aldryn_apphooks_config",
+            "parler",
+            "taggit",
+            "taggit_autosuggest",
+            "meta",
+            "djangocms_blog",
+            "sortedm2m",
+        ],
+    }
