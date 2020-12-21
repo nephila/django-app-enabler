@@ -6,9 +6,9 @@ App Enabler
 |Gitter| |PyPiVersion| |PyVersion| |GAStatus| |TestCoverage| |CodeClimate| |License|
 
 
-============
+************
 Description
-============
+************
 
 PoC autoconfigurator for django applications
 
@@ -20,14 +20,14 @@ and complex (as it's easy to overlook one vital configuration parameter), replac
 a real benefit.
 
 Key points
-----------
+==================
 
 * zero-knowledge tool to enable and configure django applications in a django project
 * rely on specification file shipped by the target application to patch django project configuration
 * not a replacement for existing package or dependencies managers (pip / poetry / pipenv / ...)
 
 Caveats
--------
+==================
 
 * Project is currently just a proof of concept
 * No formal specification or documentation exist (yet) for addon configuration file
@@ -37,7 +37,7 @@ Caveats
 See `usage`_ for more details.
 
 Compatible packages
--------------------
+===================
 
 `Up-to-date list of compatible packages`_
 
