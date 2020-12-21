@@ -19,7 +19,7 @@ def _verify_settings(imported: ModuleType, application_config: Dict[str, Any]) -
     test_passed = True
     for app in application_config["installed-apps"]:
         test_passed = test_passed and app in imported.INSTALLED_APPS
-    for key, value in application_config["settings"].items():
+    for key, value in application_config.get("settings", {}).items():
         if isinstance(value, list):
             for item in value:
                 test_passed = test_passed and item in getattr(imported, key)
@@ -38,14 +38,18 @@ def _verify_urlconf(imported: ModuleType, application_config: Dict[str, Any]) ->
     """
     # include function is added by our patcher, soo we must ensure it is available
     test_passed = bool(imported.include)
-    included_urls = [url[1] for url in application_config["urls"]]
+    included_urls = [url[1] for url in application_config.get("urls", [])]
     # as we want to make sure urlpatterns is really tested, we check both that an existing module of the correct type
     # is the module from addon config, and that the assert is reached for real
-    urlpatterns_checked = False
-    for urlpattern in imported.urlpatterns:
-        if isinstance(urlpattern.urlconf_name, ModuleType):
-            urlpatterns_checked = True
-            test_passed = test_passed and urlpattern.urlconf_name.__name__ in included_urls
+    urlpatterns_checked = not included_urls
+    if included_urls:
+        for urlpattern in imported.urlpatterns:
+            try:
+                if isinstance(urlpattern.urlconf_name, ModuleType):
+                    urlpatterns_checked = True
+                    test_passed = test_passed and urlpattern.urlconf_name.__name__ in included_urls
+            except AttributeError:
+                pass
     return test_passed and urlpatterns_checked
 
 
@@ -77,7 +81,8 @@ def output_message(message: str):
 
     :param str message: Success message to display
     """
-    sys.stdout.write(message)
+    if message:
+        sys.stdout.write(message)
 
 
 def enable(application: str, verbose: bool = False):
@@ -97,4 +102,4 @@ def enable(application: str, verbose: bool = False):
         update_setting(setting_file, application_config)
         update_urlconf(urlconf_file, application_config)
         if verify_installation(django.conf.settings, application_config):
-            output_message(application_config["message"])
+            output_message(application_config.get("message", ""))

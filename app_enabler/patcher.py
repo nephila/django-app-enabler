@@ -80,21 +80,22 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
     """
     parsed = astor.parse_file(project_setting)
     existing_setting = []
+    addon_settings = config.get("settings", {})
+    addon_installed_apps = config["installed-apps"]
     for node in parsed.body:
         if isinstance(node, ast.Assign) and node.targets[0].id == "INSTALLED_APPS":
             installed_apps = [name.s for name in node.value.elts]
-            addon_apps = [ast.Constant(app) for app in config["installed-apps"] if app not in installed_apps]
+            addon_apps = [ast.Constant(app) for app in addon_installed_apps if app not in installed_apps]
             node.value.elts.extend(addon_apps)
-        elif isinstance(node, ast.Assign) and node.targets[0].id in config["settings"].keys():  # noqa
-            config_param = config["settings"][node.targets[0].id]
+        elif isinstance(node, ast.Assign) and node.targets[0].id in addon_settings.keys():  # noqa
+            config_param = addon_settings[node.targets[0].id]
             if isinstance(node.value, ast.List) and (
                 isinstance(config_param, list) or isinstance(config_param, tuple)
             ):
-                # breakpoint()
                 for config_value in config_param:
                     node.value.elts.append(ast.Str(config_value))
             existing_setting.append(node.targets[0].id)
-    for name, value in config["settings"].items():
+    for name, value in addon_settings.items():
         if name not in existing_setting:
             parsed.body.append(ast.Assign(targets=[ast.Name(id=name)], value=ast.Constant(value)))
 
@@ -115,6 +116,7 @@ def update_urlconf(project_urls: str, config: Dict[str, Any]):
     """
     parsed = astor.parse_file(project_urls)
 
+    addon_urls = config.get("urls", [])
     for node in parsed.body:
         if isinstance(node, ast.ImportFrom) and node.module == "django.urls":
             node.names.append(ast.alias(name="include", asname=None))
@@ -130,7 +132,7 @@ def update_urlconf(project_urls: str, config: Dict[str, Any]):
                 ]
                 if calls:
                     existing_url.extend(calls)
-            for pattern, url in config.get("urls", None):
+            for pattern, url in addon_urls:
                 if url not in existing_url:
                     part = ast.parse(f"path('{pattern}', include('{url}'))")
                     node.value.elts.append(part.body[0].value)
