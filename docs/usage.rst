@@ -28,13 +28,19 @@ Sample execution flow
 
 .. code-block:: bash
 
-    python -mapp_enabler install djangocms-blog~=1.2.1
+    django-enabler install djangocms-blog~=1.2.1
     python manage.py migrate
 
 After this the django application is configured and functional.
 
 Additional configuration steps might be required according to the application
 features and support level and must be documented by the application itself.
+
+Alternatively you can execute the module itself:
+
+.. code-block:: bash
+
+    python -mapp_enabler install djangocms-blog~=1.2.1
 
 
 .. _enable_cmd:
@@ -55,7 +61,7 @@ Example:
 
 .. code-block:: bash
 
-    python -mapp_enabler enabler djangocms_blog
+    django-enabler enable djangocms_blog
 
 
 See :ref:`limitations` for limitations and caveats.
@@ -74,7 +80,7 @@ Installation is executed via the ``install`` command which a
 
 .. code-block:: bash
 
-    python -mapp_enabler install djangocms-blog~=1.2.0
+    django-enabler install djangocms-blog~=1.2.0
 
 .. note:: ``django-app-enabler`` is not intended as a replacement (or sidekick) of existing package / dependencies manager.
           The installation step is only intended as a convenience command for those not sticking to any specific workflow.
