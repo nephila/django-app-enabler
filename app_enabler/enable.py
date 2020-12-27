@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 import django.conf
 
 from .django import get_settings_path, get_urlconf_path, load_addon
+from .errors import messages
 from .patcher import setup_django, update_setting, update_urlconf
 
 
@@ -100,6 +101,8 @@ def apply_configuration(application_config: Dict[str, Any]):
     update_urlconf(urlconf_file, application_config)
     if verify_installation(django.conf.settings, application_config):
         output_message(application_config.get("message", ""))
+    else:
+        output_message(messages["verify_error"].format(package=application_config.get("package-name")))
 
 
 def enable_application(application: str, verbose: bool = False):

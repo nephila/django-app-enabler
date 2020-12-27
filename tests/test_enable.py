@@ -6,6 +6,7 @@ from types import ModuleType
 from unittest.mock import patch
 
 from app_enabler.enable import _verify_settings, _verify_urlconf, apply_configuration_set, enable_application
+from app_enabler.errors import messages
 from tests.utils import working_directory
 
 
@@ -51,6 +52,22 @@ def test_enable_minimal(capsys, pytester, project_dir, addon_config_minimal, tea
 
         imported = import_module("test_project.urls")
         assert _verify_urlconf(imported, addon_config_minimal)
+
+
+def test_verify_fail(capsys, pytester, project_dir, addon_config_minimal, blog_package, teardown_django):
+    """Enabling application load the addon configuration in settings and urlconf - minimal addon config."""
+
+    with working_directory(project_dir), patch("app_enabler.enable.load_addon") as load_addon, patch(
+        "app_enabler.enable.verify_installation"
+    ) as verify_installation:
+        load_addon.return_value = addon_config_minimal
+        verify_installation.return_value = False
+        os.environ["DJANGO_SETTINGS_MODULE"] = "test_project.settings"
+
+        enable_application("djangocms_blog")
+
+        captured = capsys.readouterr()
+        assert captured.out == messages["verify_error"].format(package="djangocms-blog")
 
 
 def test_enable_no_application(pytester, project_dir, addon_config, teardown_django):
