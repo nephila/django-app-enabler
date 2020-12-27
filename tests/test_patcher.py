@@ -1,7 +1,9 @@
+import ast
 import os
 import sys
 from importlib import import_module
 
+import astor
 import pytest
 
 from app_enabler.enable import _verify_settings, _verify_urlconf
@@ -57,3 +59,19 @@ def test_update_urlconf(pytester, django_setup, project_dir, addon_config):
     sys.path.insert(0, str(urlconf_file.parent))
     imported = import_module("urls")
     assert _verify_urlconf(imported, addon_config)
+
+
+def test_update_urlconf_multiple_include(pytester, django_setup, project_dir, addon_config):
+    """ Repeated calls to update_urlconf only add a single include. """
+    urlconf_file = project_dir / "test_project" / "urls.py"
+
+    update_urlconf(urlconf_file, addon_config)
+    update_urlconf(urlconf_file, addon_config)
+    update_urlconf(urlconf_file, addon_config)
+
+    parsed = astor.parse_file(urlconf_file)
+    for node in parsed.body:
+        if isinstance(node, ast.ImportFrom) and node.module == "django.urls":
+            assert len(node.names) == 2
+            assert "path" in (alias.name for alias in node.names)
+            assert "include" in (alias.name for alias in node.names)
