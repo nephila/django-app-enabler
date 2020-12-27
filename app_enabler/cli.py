@@ -1,3 +1,4 @@
+import os
 import sys
 from subprocess import CalledProcessError
 
@@ -13,6 +14,10 @@ from .install import get_application_from_package, install as install_fun
 @click.pass_context
 def cli(context, verbose):
     """Click entrypoint."""
+    # this is needed when calling as CLI utility to put the current directory
+    # in the python path as it's not done automatically
+    if os.getcwd() not in sys.path:
+        sys.path.insert(0, os.getcwd())
     context.ensure_object(dict)
     context.obj["verbose"] = verbose
 
