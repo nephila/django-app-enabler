@@ -16,8 +16,9 @@ def load_addon(module_name: str) -> Optional[Dict[str, Any]]:
     :return: addon configuration
     """
     try:
-        fp = resource_stream(module_name, "addon.json")
-        return json.load(fp)
+        with resource_stream(module_name, "addon.json") as fp:
+            data = json.load(fp)
+        return data
     except Exception:
         pass
 
