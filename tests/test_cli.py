@@ -1,3 +1,5 @@
+import os
+import sys
 from subprocess import CalledProcessError
 from unittest.mock import call, patch
 
@@ -18,6 +20,16 @@ def test_cli_install_wrong_dir(blog_package):
         assert result.output.strip() == messages["no_managepy"].strip()
         install_fun.assert_called_once()
         assert install_fun.call_args_list == [call("djangocms-blog", verbose=True, pip_options="")]
+
+
+def test_cli_sys_path(project_dir, blog_package):
+    """Running install command from the wrong directory raise an error."""
+    with patch("app_enabler.cli.enable_fun"):
+        # not using working_directory context manager to skip setting the sys.path (which is what we want to test)
+        os.chdir(str(project_dir))
+        runner = CliRunner()
+        runner.invoke(cli, ["enable", "djangocms-blog"])
+        assert str(project_dir) == sys.path[0]
 
 
 def test_cli_install(project_dir, blog_package):
