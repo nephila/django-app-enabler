@@ -101,8 +101,8 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
 
     src = astor.to_source(parsed)
 
-    with open(project_setting, "w") as settings:
-        settings.write(src)
+    with open(project_setting, "w") as fp:
+        fp.write(src)
 
 
 def update_urlconf(project_urls: str, config: Dict[str, Any]):
@@ -147,5 +147,5 @@ def update_urlconf(project_urls: str, config: Dict[str, Any]):
 
     src = astor.to_source(parsed)
 
-    with open(project_urls, "w") as settings:
-        settings.write(src)
+    with open(project_urls, "w") as fp:
+        fp.write(src)
