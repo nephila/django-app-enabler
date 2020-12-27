@@ -1,10 +1,12 @@
 import os
 import sys
+from pathlib import Path
 from subprocess import CalledProcessError
+from typing import List
 
 import click
 
-from .enable import enable as enable_fun
+from .enable import apply_configuration_set, enable_application as enable_fun
 from .errors import messages
 from .install import get_application_from_package, install as install_fun
 
@@ -36,6 +38,22 @@ def enable(context: click.core.Context, application: str):
     :param str application: python module name to enable. It must be the name of a Django application.
     """
     enable_fun(application, verbose=context.obj["verbose"])
+
+
+@cli.command()
+@click.argument("config_set", nargs=-1)
+@click.pass_context
+def apply(context: click.core.Context, config_set: List[str]):
+    """
+    Apply configuration stored in one or more json files.
+
+    CONFIG_SET: Path to configuration files
+    \f
+
+    :param click.core.Context context: Click context
+    :param list config_set: list of paths to addon configuration to load and apply
+    """
+    apply_configuration_set([Path(config) for config in config_set], verbose=context.obj["verbose"])
 
 
 @cli.command()

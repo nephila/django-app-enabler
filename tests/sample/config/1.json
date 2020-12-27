@@ -1,0 +1,25 @@
+[
+  {
+    "installed-apps": [
+      "taggit"
+    ],
+    "settings": {
+      "MY_SETTING_A": "some_value"
+    },
+    "urls": [
+      [
+        "",
+        "djangocms_blog.taggit_urls"
+      ]
+    ],
+    "message": "json1-a"
+  },
+  {
+    "installed-apps": [
+    ],
+    "settings": {
+      "MY_SETTING_B": "some_value"
+    },
+    "message": "json1-b"
+  }
+]

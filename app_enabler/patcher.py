@@ -81,7 +81,7 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
     parsed = astor.parse_file(project_setting)
     existing_setting = []
     addon_settings = config.get("settings", {})
-    addon_installed_apps = config["installed-apps"]
+    addon_installed_apps = config.get("installed-apps", [])
     for node in parsed.body:
         if isinstance(node, ast.Assign) and node.targets[0].id == "INSTALLED_APPS":
             installed_apps = [name.s for name in node.value.elts]
