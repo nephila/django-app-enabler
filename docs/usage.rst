@@ -18,6 +18,7 @@ Installation
 Commands
 *************************
 
+* :ref:`apply \<path_to_json\> \<path_to_json\> <apply_cmd>`: Apply configuration from json files
 * :ref:`enable \<module_name\> <enable_cmd>`: Configure an application
 * :ref:`install \<package-name\> <install_cmd>`: Install and configure an application
 
@@ -62,6 +63,30 @@ Example:
 .. code-block:: bash
 
     django-enabler enable djangocms_blog
+
+
+See :ref:`limitations` for limitations and caveats.
+
+
+.. _apply_cmd:
+
+*************************
+Apply configurations
+*************************
+
+``django-app-enabler`` can also apply configuration from arbitrary json files not included in any Django application.
+
+Each configuration file must comply with :ref:`extra_json`.
+
+.. note:: Django ``settings`` and ``urlconf`` are patched unconditionally.
+          No attempt to verify that applications declared in ``installed_apps``
+          or added to the ``urlconf`` are available in the virtualenv is made.
+
+Example:
+
+.. code-block:: bash
+
+    django-enabler apply /path/to/config1.json /path/to/config2.json
 
 
 See :ref:`limitations` for limitations and caveats.

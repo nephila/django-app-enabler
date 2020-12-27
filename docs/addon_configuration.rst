@@ -24,6 +24,18 @@ the minimal setup to make the application up an running on a clean django projec
 .. warning:: The file must be included in root of the first (alphabetically) module of your application package.
              See :ref:`packaging` for details.
 
+.. _extra_json:
+
+****************************************
+Extra configuration files specifications
+****************************************
+
+Extra configuration files (applied via :ref:`apply_cmd`) must conform to the same specifications below with two exceptions:
+
+- all attributes are optional (i.e.: they can be completely omitted)
+- the json file can contain a single object like for the ``addon.json`` case, or a list of objects conforming to the specifications.
+
+
 Attributes
 ===========
 

@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 from subprocess import CalledProcessError
 from unittest.mock import call, patch
 
@@ -119,6 +120,25 @@ def test_cli_enable(verbose: bool):
 
         enable_fun.assert_called_once()
         assert enable_fun.call_args_list == [call("djangocms_blog", verbose=verbose)]
+
+
+@pytest.mark.parametrize("verbose", (True, False))
+def test_cli_apply(verbose: bool):
+    """Running apply command calls the business functions with the correct arguments."""
+    with patch("app_enabler.cli.apply_configuration_set") as apply_configuration_set:
+        runner = CliRunner()
+        if verbose:
+            args = ["--verbose"]
+        else:
+            args = []
+
+        configs = ("/path/config1.json", "/path/config2.json")
+        args.extend(("apply", *configs))
+        result = runner.invoke(cli, args)
+        assert result.exit_code == 0
+
+        apply_configuration_set.assert_called_once()
+        assert apply_configuration_set.call_args_list == [call([Path(config) for config in configs], verbose=verbose)]
 
 
 @pytest.mark.parametrize("verbose", (True, False))

@@ -1,11 +1,14 @@
+import json
 import sys
 from importlib import import_module
+from pathlib import Path
 from types import ModuleType
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import django.conf
 
 from .django import get_settings_path, get_urlconf_path, load_addon
+from .errors import messages
 from .patcher import setup_django, update_setting, update_urlconf
 
 
@@ -17,7 +20,7 @@ def _verify_settings(imported: ModuleType, application_config: Dict[str, Any]) -
     :param dict application_config: addon configuration
     """
     test_passed = True
-    for app in application_config["installed-apps"]:
+    for app in application_config.get("installed-apps", []):
         test_passed = test_passed and app in imported.INSTALLED_APPS
     for key, value in application_config.get("settings", {}).items():
         if isinstance(value, list):
@@ -85,21 +88,53 @@ def output_message(message: str):
         sys.stdout.write(message)
 
 
-def enable(application: str, verbose: bool = False):
+def apply_configuration(application_config: Dict[str, Any]):
+    """
+    Enable django application in the current project
+
+    :param dict application_config: addon configuration
+    """
+
+    setting_file = get_settings_path(django.conf.settings)
+    urlconf_file = get_urlconf_path(django.conf.settings)
+    update_setting(setting_file, application_config)
+    update_urlconf(urlconf_file, application_config)
+    if verify_installation(django.conf.settings, application_config):
+        output_message(application_config.get("message", ""))
+    else:
+        output_message(messages["verify_error"].format(package=application_config.get("package-name")))
+
+
+def enable_application(application: str, verbose: bool = False):
     """
     Enable django application in the current project
 
     :param str application: python module name to enable. It must be the name of a Django application.
     :param bool verbose: Verbose output (currently unused)
     """
-
     setup_django()
 
-    setting_file = get_settings_path(django.conf.settings)
-    urlconf_file = get_urlconf_path(django.conf.settings)
     application_config = load_addon(application)
     if application_config:
-        update_setting(setting_file, application_config)
-        update_urlconf(urlconf_file, application_config)
-        if verify_installation(django.conf.settings, application_config):
-            output_message(application_config.get("message", ""))
+        apply_configuration(application_config)
+
+
+def apply_configuration_set(config_set: List[Path], verbose: bool = False):
+    """
+    Apply settings from the list of input files.
+
+    :param list config_set: list of paths to addon configuration to load and apply
+    :param bool verbose: Verbose output (currently unused)
+    """
+    setup_django()
+
+    for config_path in config_set:
+        try:
+            config_data = json.loads(config_path.read_text())
+        except OSError:
+            config_data = []
+        if config_data:
+            if not isinstance(config_data, list):
+                config_data = [config_data]
+            for item in config_data:
+                apply_configuration(item)
