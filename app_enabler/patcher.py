@@ -119,22 +119,30 @@ def update_urlconf(project_urls: str, config: Dict[str, Any]):
     addon_urls = config.get("urls", [])
     for node in parsed.body:
         if isinstance(node, ast.ImportFrom) and node.module == "django.urls":
-            node.names.append(ast.alias(name="include", asname=None))
+            existing_names = [alias.name for alias in node.names]
+            if "include" not in existing_names:
+                node.names.append(ast.alias(name="include", asname=None))
         elif isinstance(node, ast.Assign) and node.targets[0].id == "urlpatterns":
-            existing_url = []
+            existing_urlconf = []
             for url_line in node.value.elts:
-                calls = [
+                # the following list comprehension matches path() / url() instances in urlpatterns
+                # using the `include()` statement as argument. ie.
+                # - matched: path('', include('cms.urls')
+                # - not matched: path('sitemap.xml', sitemap, {})
+                # we look for ast.Call (outer loop) wrapping ast.Str (inner loop),
+                # and we assume all is wrapped in ast.Call (as we cycle on url_line.args)
+                urlconf_path = [
                     subarg.s
                     for stmt in url_line.args
                     if isinstance(stmt, ast.Call)
                     for subarg in stmt.args
                     if isinstance(subarg, ast.Str)
                 ]
-                if calls:
-                    existing_url.extend(calls)
-            for pattern, url in addon_urls:
-                if url not in existing_url:
-                    part = ast.parse(f"path('{pattern}', include('{url}'))")
+                if urlconf_path:
+                    existing_urlconf.extend(urlconf_path)
+            for pattern, urlconf in addon_urls:
+                if urlconf not in existing_urlconf:
+                    part = ast.parse(f"path('{pattern}', include('{urlconf}'))")
                     node.value.elts.append(part.body[0].value)
 
     src = astor.to_source(parsed)
