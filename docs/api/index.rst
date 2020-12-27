@@ -4,21 +4,26 @@
 API
 ###
 
+********
+Commands
+********
+
+.. click:: app_enabler.cli:cli
+  :prog: django-enabler
+  :show-nested:
+
 *******
 CLI
 *******
 
 .. automodule:: app_enabler.cli
     :members:
-    :private-members:
 
 .. automodule:: app_enabler.enable
     :members:
-    :private-members:
 
 .. automodule:: app_enabler.install
     :members:
-    :private-members:
 
 *******
 Loaders
@@ -26,7 +31,6 @@ Loaders
 
 .. automodule:: app_enabler.django
     :members:
-    :private-members:
 
 ********
 Patchers
@@ -34,4 +38,3 @@ Patchers
 
 .. automodule:: app_enabler.patcher
     :members:
-    :private-members:
