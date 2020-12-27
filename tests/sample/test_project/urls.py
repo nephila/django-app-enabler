@@ -13,11 +13,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path
+from django.views import View
 
 urlpatterns = [
     path("sitemap.xml", sitemap, {"sitemaps": {}}),
     path("admin/", admin.site.urls),
 ]
+
+urlpatterns += [
+    path("something/", View.as_view()),
+]
+
+urlpatterns += i18n_patterns(
+    path("something/", View.as_view()),
+)

@@ -5,6 +5,7 @@ from importlib import import_module
 
 import astor
 import pytest
+from django.urls import LocalePrefixPattern, URLPattern, URLResolver
 
 from app_enabler.enable import _verify_settings, _verify_urlconf
 from app_enabler.errors import messages
@@ -75,3 +76,38 @@ def test_update_urlconf_multiple_include(pytester, django_setup, project_dir, ad
             assert len(node.names) == 2
             assert "path" in (alias.name for alias in node.names)
             assert "include" in (alias.name for alias in node.names)
+
+
+def test_update_urlconf_multiple_urlconf(pytester, django_setup, project_dir, addon_config):
+    """ Repeated calls to update_urlconf only add a single application urlconf instance. """
+    urlconf_file = project_dir / "test_project" / "urls.py"
+
+    update_urlconf(urlconf_file, addon_config)
+    update_urlconf(urlconf_file, addon_config)
+    update_urlconf(urlconf_file, addon_config)
+
+    imported_urlconf = import_module("test_project.urls")
+    instances_admin = 0
+    instances_blog = 0
+    instances_i18n = 0
+    instances_view = 0
+    instances_sitemap = 0
+    for pattern in imported_urlconf.urlpatterns:
+        if isinstance(pattern, URLResolver):
+            if isinstance(pattern.urlconf_module, list):
+                if pattern.app_name == "admin":
+                    instances_admin += 1
+                elif isinstance(pattern.pattern, LocalePrefixPattern):
+                    instances_i18n += 1
+            elif pattern.urlconf_module.__name__ == "djangocms_blog.taggit_urls":
+                instances_blog += 1
+        elif isinstance(pattern, URLPattern):
+            if pattern.lookup_str == "django.contrib.sitemaps.views.sitemap":
+                instances_sitemap += 1
+            elif pattern.lookup_str == "django.views.generic.base.View":
+                instances_view += 1
+    assert instances_admin == 1
+    assert instances_blog == 1
+    assert instances_i18n == 1
+    assert instances_view == 1
+    assert instances_sitemap == 1
