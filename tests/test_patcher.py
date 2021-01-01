@@ -50,6 +50,16 @@ def test_update_setting(pytester, project_dir, addon_config):
     sys.path.insert(0, str(settings_file.parent))
     imported = import_module("settings")
     assert _verify_settings(imported, addon_config)
+    assert imported.MIDDLEWARE.index("django.middleware.common.CommonMiddleware") > imported.MIDDLEWARE.index(
+        "django.middleware.locale.LocaleMiddleware"
+    )
+    assert imported.MIDDLEWARE.index("django.middleware.http.ConditionalGetMiddleware") == 2
+    assert (
+        imported.AUTH_PASSWORD_VALIDATORS[0]["NAME"]
+        == "django.contrib.auth.password_validation.NumericPasswordValidator"
+    )
+    assert imported.INSTALLED_APPS.index("taggit") == imported.INSTALLED_APPS.index("taggit_autosuggest") + 1
+    assert imported.INSTALLED_APPS.index("aldryn_apphooks_config") == 0
 
 
 def test_update_urlconf(pytester, django_setup, project_dir, addon_config):

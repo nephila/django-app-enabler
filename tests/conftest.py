@@ -60,10 +60,13 @@ def addon_config() -> Dict[str, Any]:
         "installed-apps": [
             "filer",
             "easy_thumbnails",
-            "aldryn_apphooks_config",
+            {"value": "aldryn_apphooks_config", "next": "cms"},
             "parler",
             "taggit",
-            "taggit_autosuggest",
+            {
+                "value": "taggit_autosuggest",
+                "next": "taggit",
+            },
             "meta",
             "djangocms_blog",
             "sortedm2m",
@@ -71,7 +74,24 @@ def addon_config() -> Dict[str, Any]:
         "settings": {
             "META_SITE_PROTOCOL": "https",
             "META_USE_SITES": True,
-            "MIDDLEWARE": ["django.middleware.gzip.GZipMiddleware"],
+            "LANGUAGE_CODE": "it-IT",
+            "MIDDLEWARE": [
+                "django.middleware.gzip.GZipMiddleware",
+                {"value": "django.middleware.http.ConditionalGetMiddleware", "position": 2},
+                {
+                    "value": "django.middleware.locale.LocaleMiddleware",
+                    "next": "django.middleware.common.CommonMiddleware",
+                },
+            ],
+            "AUTH_PASSWORD_VALIDATORS": [
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+                    "key": "NAME",
+                },
+            ],
         },
         "urls": [["", "djangocms_blog.taggit_urls"]],
         "message": "Please check documentation to complete the setup",
