@@ -85,7 +85,8 @@ def _update_list_setting(original_setting: List, configuration: Iterable):
         except AttributeError:
             return ast_obj.s
 
-    def _ast_get_object_from_value(val: Any):
+    def _ast_get_object_from_value(val: Any) -> ast.Constant:
+        """Convert value to AST via :py:func:`ast.parse`."""
         return ast.parse(repr(val)).body[0].value
 
     for config_value in configuration:
