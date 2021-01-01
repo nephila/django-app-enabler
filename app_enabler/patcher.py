@@ -2,7 +2,7 @@ import ast
 import os  # noqa - used when eval'ing the management command
 import sys
 from types import CodeType
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Union
 
 import astor
 
@@ -71,14 +71,28 @@ class DisableExecute(ast.NodeTransformer):
 def _update_list_setting(original_setting: List, configuration: Iterable):
     def _ast_dict_lookup(dict_object: ast.Dict, lookup_key: str) -> Any:
         """Get the value of the lookup key in the ast Dict object."""
-        key_position = [dict_key.value for dict_key in dict_object.keys].index(lookup_key)
-        return dict_object.values[key_position].value
+        key_position = [_ast_get_constant_value(dict_key) for dict_key in dict_object.keys].index(lookup_key)
+        return _ast_get_constant_value(dict_object.values[key_position])
+
+    def _ast_get_constant_value(ast_obj: Union[ast.Constant, ast.Str, ast.Num]) -> Any:
+        """
+        Extract the value from an ast.Constant / ast.Str / ast.Num obj.
+
+        Required as in python 3.6 / 3.7 ast.Str / ast.Num are not subclasses of ast.Constant
+        """
+        try:
+            return ast_obj.value
+        except AttributeError:
+            return ast_obj.s
+
+    def _ast_get_object_from_value(val: Any):
+        return ast.parse(repr(val)).body[0].value
 
     for config_value in configuration:
         # configuration items can be either strings (which are appended) or dictionaries which contains information
         # about the position of the item
         if isinstance(config_value, str):
-            if config_value not in [name.s for name in original_setting]:
+            if config_value not in [_ast_get_constant_value(item) for item in original_setting]:
                 original_setting.append(ast.Str(config_value))
         elif isinstance(config_value, dict):
             value = config_value.get("value", None)
@@ -91,10 +105,10 @@ def _update_list_setting(original_setting: List, configuration: Iterable):
                 if key:
                     # if the match is against a key we must both flatted the original setting to a list of literals
                     # extracting the key value and getting the key value for the setting we want to add
-                    flattened_data = [_ast_dict_lookup(o, key) for o in original_setting]
+                    flattened_data = [_ast_dict_lookup(item, key) for item in original_setting]
                     check_value = value[key]
                 else:
-                    flattened_data = [o.value for o in original_setting]
+                    flattened_data = [_ast_get_constant_value(item) for item in original_setting]
                     check_value = value
                 if check_value not in flattened_data:
                     try:
@@ -103,7 +117,7 @@ def _update_list_setting(original_setting: List, configuration: Iterable):
                         # in case the relative item is not found we add the value on top
                         position = 0
             if position is not None:
-                original_setting.insert(position, ast.Constant(value))
+                original_setting.insert(position, _ast_get_object_from_value(value))
 
 
 def update_setting(project_setting: str, config: Dict[str, Any]):
@@ -128,7 +142,8 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
                 isinstance(config_param, list) or isinstance(config_param, tuple)
             ):
                 _update_list_setting(node.value.elts, config_param)
-            elif isinstance(node.value, ast.Constant):
+            elif type(node.value) in (ast.Constant, ast.Str, ast.Num):
+                # check required as in python 3.6 / 3.7 ast.Str / ast.Num are not subclasses of ast.Constant
                 node.value = ast.Constant(config_param)
             existing_setting.append(node.targets[0].id)
     for name, value in addon_settings.items():

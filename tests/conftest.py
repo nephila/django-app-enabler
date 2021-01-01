@@ -91,6 +91,13 @@ def addon_config() -> Dict[str, Any]:
                     "next": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
                     "key": "NAME",
                 },
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+                    "key": "NAME",
+                },
             ],
         },
         "urls": [["", "djangocms_blog.taggit_urls"]],
