@@ -34,15 +34,15 @@ def _verify_settings(imported: ModuleType, application_config: Dict[str, Any]) -
                 if isinstance(item, dict):
                     real_item = item["value"]
                     passed = passed and (real_item in getattr(imported, key))
-                    if not passed:
+                    if not passed:  # pragma: no cover
                         warnings.warn(f"Configuration error for {key}", RuntimeWarning)
                 else:
                     passed = passed and (item in getattr(imported, key))
-                    if not passed:
+                    if not passed:  # pragma: no cover
                         warnings.warn(f"Configuration error for {key}", RuntimeWarning)
         else:
             passed = passed and getattr(imported, key) == value
-            if not passed:
+            if not passed:  # pragma: no cover
                 warnings.warn(f"Configuration error for {key}", RuntimeWarning)
         return passed
 
