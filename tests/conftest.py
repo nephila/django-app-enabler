@@ -69,12 +69,22 @@ def addon_config() -> Dict[str, Any]:
             },
             "meta",
             "djangocms_blog",
+            "taggit_autosuggest",
             "sortedm2m",
         ],
         "settings": {
             "META_SITE_PROTOCOL": "https",
             "META_USE_SITES": True,
+            "USE_I18N": False,
             "LANGUAGE_CODE": "it-IT",
+            "CACHES": {
+                "default": {
+                    "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                },
+                "dummy": {
+                    "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+                },
+            },
             "MIDDLEWARE": [
                 "django.middleware.gzip.GZipMiddleware",
                 {"value": "django.middleware.http.ConditionalGetMiddleware", "position": 2},
@@ -88,7 +98,7 @@ def addon_config() -> Dict[str, Any]:
                     "value": {
                         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
                     },
-                    "next": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+                    "next": "django.contrib.auth.password_validation.MinimumLengthValidator",
                     "key": "NAME",
                 },
                 {
@@ -97,6 +107,20 @@ def addon_config() -> Dict[str, Any]:
                     },
                     "next": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
                     "key": "NAME",
+                },
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.SuperCommonPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.LessCommonPasswordValidator",
+                    "key": "NAME",
+                },
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.BotchedCommonPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.LessCommonPasswordValidator",
+                    "key": "NOPE",
                 },
             ],
         },

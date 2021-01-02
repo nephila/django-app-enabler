@@ -1,5 +1,6 @@
 import json
 import sys
+import warnings
 from importlib import import_module
 from pathlib import Path
 from types import ModuleType
@@ -33,10 +34,16 @@ def _verify_settings(imported: ModuleType, application_config: Dict[str, Any]) -
                 if isinstance(item, dict):
                     real_item = item["value"]
                     passed = passed and (real_item in getattr(imported, key))
+                    if not passed:
+                        warnings.warn(f"Configuration error for {key}", RuntimeWarning)
                 else:
                     passed = passed and (item in getattr(imported, key))
+                    if not passed:
+                        warnings.warn(f"Configuration error for {key}", RuntimeWarning)
         else:
             passed = passed and getattr(imported, key) == value
+            if not passed:
+                warnings.warn(f"Configuration error for {key}", RuntimeWarning)
         return passed
 
     test_passed = _validate_setting("INSTALLED_APPS", application_config.get("installed-apps", []))
