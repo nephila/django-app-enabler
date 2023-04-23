@@ -44,7 +44,7 @@ def test_setup_django(project_dir, teardown_django):
 
 
 def test_update_setting(pytester, project_dir, addon_config):
-    """ Project settings is patched with data from addon configuration. """
+    """Project settings is patched with data from addon configuration."""
     settings_file = project_dir / "test_project" / "settings.py"
 
     update_setting(settings_file, addon_config)
@@ -76,7 +76,7 @@ def test_update_setting(pytester, project_dir, addon_config):
 
 
 def test_update_urlconf(pytester, django_setup, project_dir, addon_config):
-    """ Project urlconf is patched with data from addon configuration. """
+    """Project urlconf is patched with data from addon configuration."""
     urlconf_file = project_dir / "test_project" / "urls.py"
 
     update_urlconf(urlconf_file, addon_config)
@@ -86,7 +86,7 @@ def test_update_urlconf(pytester, django_setup, project_dir, addon_config):
 
 
 def test_update_urlconf_multiple_include(pytester, django_setup, project_dir, addon_config):
-    """ Repeated calls to update_urlconf only add a single include. """
+    """Repeated calls to update_urlconf only add a single include."""
     urlconf_file = project_dir / "test_project" / "urls.py"
 
     update_urlconf(urlconf_file, addon_config)
@@ -102,7 +102,7 @@ def test_update_urlconf_multiple_include(pytester, django_setup, project_dir, ad
 
 
 def test_update_urlconf_multiple_urlconf(pytester, django_setup, project_dir, addon_config):
-    """ Repeated calls to update_urlconf only add a single application urlconf instance. """
+    """Repeated calls to update_urlconf only add a single application urlconf instance."""
     urlconf_file = project_dir / "test_project" / "urls.py"
 
     update_urlconf(urlconf_file, addon_config)
