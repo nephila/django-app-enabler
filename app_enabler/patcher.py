@@ -102,7 +102,6 @@ def _ast_get_object_from_value(val: Any) -> ast.Constant:
 
 
 def _update_list_setting(original_setting: List, configuration: Iterable):
-
     for config_value in configuration:
         # configuration items can be either strings (which are appended) or dictionaries which contains information
         # about the position of the item

@@ -8,23 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.8, 3.7, 3.6]
-        django: [31, 30, 22]
+        python-version: ["3.11", "3.10", "3.9"]
+        django: [42, 41, 32]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Cache pip
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ matrix.toxenv }}
         restore-keys: |
           ${{ runner.os }}-pip-${{ matrix.toxenv }}
     - name: Cache tox
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: .tox
         key: ${{ runner.os }}-tox-${{ format('{{py{0}-django{1}}}', matrix.python-version, matrix.django) }}-${{ hashFiles('setup.cfg') }}
