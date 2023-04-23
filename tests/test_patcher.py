@@ -1,6 +1,7 @@
 import ast
 import os
 import sys
+import warnings
 from importlib import import_module
 
 import astor
@@ -49,7 +50,29 @@ def test_update_setting(pytester, project_dir, addon_config):
     update_setting(settings_file, addon_config)
     sys.path.insert(0, str(settings_file.parent))
     imported = import_module("settings")
-    assert _verify_settings(imported, addon_config)
+    with warnings.catch_warnings(record=True) as w:
+        # settings is not verified as BotchedCommonPasswordValidator is not added, this is expected and tested
+        assert _verify_settings(imported, addon_config) is False
+        assert len(w) == 1
+        assert issubclass(w[-1].category, RuntimeWarning)
+        assert "Configuration error for AUTH_PASSWORD_VALIDATORS" in str(w[-1].message)
+    assert imported.MIDDLEWARE.index("django.middleware.common.CommonMiddleware") > imported.MIDDLEWARE.index(
+        "django.middleware.locale.LocaleMiddleware"
+    )
+    assert imported.MIDDLEWARE.index("django.middleware.http.ConditionalGetMiddleware") == 2
+    assert (
+        imported.AUTH_PASSWORD_VALIDATORS[0]["NAME"]
+        == "django.contrib.auth.password_validation.SuperCommonPasswordValidator"
+    )
+    assert (
+        imported.AUTH_PASSWORD_VALIDATORS[2]["NAME"]
+        == "django.contrib.auth.password_validation.NumericPasswordValidator"
+    )
+    assert "django.contrib.auth.password_validation.BotchedCommonPasswordValidator" not in [
+        item["NAME"] for item in imported.AUTH_PASSWORD_VALIDATORS
+    ]
+    assert imported.INSTALLED_APPS.index("taggit") == imported.INSTALLED_APPS.index("taggit_autosuggest") + 1
+    assert imported.INSTALLED_APPS.index("aldryn_apphooks_config") == 0
 
 
 def test_update_urlconf(pytester, django_setup, project_dir, addon_config):

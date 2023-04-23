@@ -2,7 +2,7 @@ import ast
 import os  # noqa - used when eval'ing the management command
 import sys
 from types import CodeType
-from typing import Any, Dict
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import astor
 
@@ -58,7 +58,6 @@ class DisableExecute(ast.NodeTransformer):
 
     def visit_Expr(self, node: ast.AST) -> Any:  # noqa
         """Visit the ``Expr`` node and remove it if it matches ``'execute_from_command_line'``."""
-        # long chained checks, but we have to remove the entire call, thus we have to remove the Expr node
         if (
             isinstance(node.value, ast.Call)
             and isinstance(node.value.func, ast.Name)  # noqa
@@ -67,6 +66,73 @@ class DisableExecute(ast.NodeTransformer):
             return None
         else:
             return node
+
+
+def _ast_get_constant_value(ast_obj: Union[ast.Constant, ast.Str, ast.Num]) -> Any:
+    """
+    Extract the value from an ast.Constant / ast.Str / ast.Num obj.
+
+    Required as in python 3.6 / 3.7 ast.Str / ast.Num are not subclasses of ast.Constant
+    """
+    try:
+        return ast_obj.value
+    except AttributeError:
+        return ast_obj.s
+
+
+def _ast_dict_key_index(dict_object: ast.Dict, lookup_key: str) -> Optional[int]:
+    """Get the index of the lookup key in the ast Dict object."""
+    try:
+        return [_ast_get_constant_value(dict_key) for dict_key in dict_object.keys].index(lookup_key)
+    except ValueError:
+        return None
+
+
+def _ast_dict_lookup(dict_object: ast.Dict, lookup_key: str) -> Optional[Any]:
+    """Get the value of the lookup key in the ast Dict object."""
+    key_position = _ast_dict_key_index(dict_object, lookup_key)
+    if key_position is None:
+        return None
+    return _ast_get_constant_value(dict_object.values[key_position])
+
+
+def _ast_get_object_from_value(val: Any) -> ast.Constant:
+    """Convert value to AST via :py:func:`ast.parse`."""
+    return ast.parse(repr(val)).body[0].value
+
+
+def _update_list_setting(original_setting: List, configuration: Iterable):
+
+    for config_value in configuration:
+        # configuration items can be either strings (which are appended) or dictionaries which contains information
+        # about the position of the item
+        if isinstance(config_value, dict):
+            value = config_value.get("value", None)
+            position = config_value.get("position", None)
+            relative_item = config_value.get("next", None)
+            key = config_value.get("key", None)
+            if relative_item:
+                # if the item is already existing, we skip its insertion
+                position = None
+                if key:
+                    # if the match is against a key we must both flatted the original setting to a list of literals
+                    # extracting the key value and getting the key value for the setting we want to add
+                    flattened_data = [_ast_dict_lookup(item, key) for item in original_setting]
+                    check_value = value.get(key, None)
+                else:
+                    flattened_data = [_ast_get_constant_value(item) for item in original_setting]
+                    check_value = value
+                if any(flattened_data) and check_value not in flattened_data:
+                    try:
+                        position = flattened_data.index(relative_item)
+                    except ValueError:
+                        # in case the relative item is not found we add the value on top
+                        position = 0
+            if position is not None:
+                original_setting.insert(position, _ast_get_object_from_value(value))
+        else:
+            if config_value not in [_ast_get_constant_value(item) for item in original_setting]:
+                original_setting.append(_ast_get_object_from_value(config_value))
 
 
 def update_setting(project_setting: str, config: Dict[str, Any]):
@@ -82,22 +148,33 @@ def update_setting(project_setting: str, config: Dict[str, Any]):
     existing_setting = []
     addon_settings = config.get("settings", {})
     addon_installed_apps = config.get("installed-apps", [])
+    constant_subclasses = (ast.Constant, ast.Num, ast.Str, ast.Bytes, ast.NameConstant, ast.Ellipsis)
+
     for node in parsed.body:
         if isinstance(node, ast.Assign) and node.targets[0].id == "INSTALLED_APPS":
-            installed_apps = [name.s for name in node.value.elts]
-            addon_apps = [ast.Constant(app) for app in addon_installed_apps if app not in installed_apps]
-            node.value.elts.extend(addon_apps)
+            _update_list_setting(node.value.elts, addon_installed_apps)
         elif isinstance(node, ast.Assign) and node.targets[0].id in addon_settings.keys():  # noqa
             config_param = addon_settings[node.targets[0].id]
             if isinstance(node.value, ast.List) and (
                 isinstance(config_param, list) or isinstance(config_param, tuple)
             ):
-                for config_value in config_param:
-                    node.value.elts.append(ast.Str(config_value))
+                _update_list_setting(node.value.elts, config_param)
+            elif isinstance(node.value, ast.Dict):
+                for dict_key, dict_value in config_param.items():
+                    ast_position = _ast_dict_key_index(node.value, dict_key)
+                    if ast_position is None:
+                        node.value.keys.append(_ast_get_object_from_value(dict_key))
+                        node.value.values.append(_ast_get_object_from_value(dict_value))
+                    else:
+                        node.value.values[ast_position] = _ast_get_object_from_value(dict_value)
+                pass
+            elif type(node.value) in constant_subclasses:
+                # check required as in python 3.6 / 3.7 ast.Str / ast.Num are not subclasses of ast.Constant
+                node.value = _ast_get_object_from_value(config_param)
             existing_setting.append(node.targets[0].id)
     for name, value in addon_settings.items():
         if name not in existing_setting:
-            parsed.body.append(ast.Assign(targets=[ast.Name(id=name)], value=ast.Constant(value)))
+            parsed.body.append(ast.Assign(targets=[ast.Name(id=name)], value=_ast_get_object_from_value(value)))
 
     src = astor.to_source(parsed)
 

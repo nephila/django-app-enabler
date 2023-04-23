@@ -60,18 +60,69 @@ def addon_config() -> Dict[str, Any]:
         "installed-apps": [
             "filer",
             "easy_thumbnails",
-            "aldryn_apphooks_config",
+            {"value": "aldryn_apphooks_config", "next": "cms"},
             "parler",
             "taggit",
-            "taggit_autosuggest",
+            {
+                "value": "taggit_autosuggest",
+                "next": "taggit",
+            },
             "meta",
             "djangocms_blog",
+            "taggit_autosuggest",
             "sortedm2m",
         ],
         "settings": {
             "META_SITE_PROTOCOL": "https",
             "META_USE_SITES": True,
-            "MIDDLEWARE": ["django.middleware.gzip.GZipMiddleware"],
+            "USE_I18N": False,
+            "LANGUAGE_CODE": "it-IT",
+            "CACHES": {
+                "default": {
+                    "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                },
+                "dummy": {
+                    "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+                },
+            },
+            "MIDDLEWARE": [
+                "django.middleware.gzip.GZipMiddleware",
+                {"value": "django.middleware.http.ConditionalGetMiddleware", "position": 2},
+                {
+                    "value": "django.middleware.locale.LocaleMiddleware",
+                    "next": "django.middleware.common.CommonMiddleware",
+                },
+            ],
+            "AUTH_PASSWORD_VALIDATORS": [
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.MinimumLengthValidator",
+                    "key": "NAME",
+                },
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+                    "key": "NAME",
+                },
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.SuperCommonPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.LessCommonPasswordValidator",
+                    "key": "NAME",
+                },
+                {
+                    "value": {
+                        "NAME": "django.contrib.auth.password_validation.BotchedCommonPasswordValidator",
+                    },
+                    "next": "django.contrib.auth.password_validation.LessCommonPasswordValidator",
+                    "key": "NOPE",
+                },
+            ],
         },
         "urls": [["", "djangocms_blog.taggit_urls"]],
         "message": "Please check documentation to complete the setup",

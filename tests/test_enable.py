@@ -14,6 +14,7 @@ def test_enable(capsys, pytester, project_dir, addon_config, teardown_django):
     """Enabling application load the addon configuration in settings and urlconf."""
 
     with working_directory(project_dir), patch("app_enabler.enable.load_addon") as load_addon:
+        del addon_config["settings"]["AUTH_PASSWORD_VALIDATORS"][-1]
         load_addon.return_value = addon_config
         os.environ["DJANGO_SETTINGS_MODULE"] = "test_project.settings"
 
