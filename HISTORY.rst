@@ -6,6 +6,19 @@ History
 
 .. towncrier release notes start
 
+0.3.0 (2023-11-09)
+==================
+
+Features
+--------
+
+- Improve merge strategy to support all the basic standard Django settings (#5)
+- Add support for external configuration json (#9)
+- Upgrade to Django 3.2/4.2 (#32)
+- Switch to Coveralls Github action (#56)
+- Migrate to bump-my-version (#58)
+
+
 0.2.0 (2020-12-27)
 ==================
 
