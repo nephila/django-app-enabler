@@ -5,7 +5,9 @@ Credits
 Development Lead
 ----------------
 
-* 'Iacopo Spalletti
+* Iacopo Spalletti
 
 Contributors
 ------------
+
+* Leonardo Cavallucci
