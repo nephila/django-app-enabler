@@ -35,9 +35,11 @@ def test_cli_sys_path(project_dir, blog_package):
 
 def test_cli_install(project_dir, blog_package):
     """Running install command calls the business functions with the correct arguments."""
-    with patch("app_enabler.cli.enable_fun") as enable_fun, patch(
-        "app_enabler.cli.install_fun"
-    ) as install_fun, working_directory(project_dir):
+    with (
+        patch("app_enabler.cli.enable_fun") as enable_fun,
+        patch("app_enabler.cli.install_fun") as install_fun,
+        working_directory(project_dir),
+    ):
         runner = CliRunner()
         result = runner.invoke(cli, ["--verbose", "install", "djangocms-blog"])
         assert result.exit_code == 0
@@ -80,9 +82,11 @@ def test_cli_install_error_verbose(verbose: bool):
 @pytest.mark.parametrize("verbose", (True, False))
 def test_cli_install_bad_application_verbose(verbose: bool):
     """Error due to bad application name is reported to the user."""
-    with patch("app_enabler.cli.enable_fun") as enable_fun, patch("app_enabler.cli.install_fun"), patch(
-        "app_enabler.cli.get_application_from_package"
-    ) as get_application_from_package:
+    with (
+        patch("app_enabler.cli.enable_fun") as enable_fun,
+        patch("app_enabler.cli.install_fun"),
+        patch("app_enabler.cli.get_application_from_package") as get_application_from_package,
+    ):
         get_application_from_package.return_value = None
 
         runner = CliRunner()
