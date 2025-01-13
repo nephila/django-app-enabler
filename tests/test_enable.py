@@ -58,9 +58,11 @@ def test_enable_minimal(capsys, pytester, project_dir, addon_config_minimal, tea
 def test_verify_fail(capsys, pytester, project_dir, addon_config_minimal, blog_package, teardown_django):
     """Enabling application load the addon configuration in settings and urlconf - minimal addon config."""
 
-    with working_directory(project_dir), patch("app_enabler.enable.load_addon") as load_addon, patch(
-        "app_enabler.enable.verify_installation"
-    ) as verify_installation:
+    with (
+        working_directory(project_dir),
+        patch("app_enabler.enable.load_addon") as load_addon,
+        patch("app_enabler.enable.verify_installation") as verify_installation,
+    ):
         load_addon.return_value = addon_config_minimal
         verify_installation.return_value = False
         os.environ["DJANGO_SETTINGS_MODULE"] = "test_project.settings"
