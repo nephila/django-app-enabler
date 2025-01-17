@@ -6,6 +6,15 @@ History
 
 .. towncrier release notes start
 
+0.4.0 (2025-01-17)
+==================
+
+Bugfixes
+--------
+
+- Fix docs build, drop support for Django < 4.2 and python < 3.10 (#64)
+
+
 0.3.0 (2023-11-09)
 ==================
 
