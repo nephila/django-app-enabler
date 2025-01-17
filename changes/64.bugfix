@@ -1,0 +1,1 @@
+Fix docs build, drop support for Django < 4.2 and python < 3.10
