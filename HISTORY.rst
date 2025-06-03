@@ -6,6 +6,15 @@ History
 
 .. towncrier release notes start
 
+0.5.0 (2025-06-03)
+==================
+
+Bugfixes
+--------
+
+- Pin click version to < 8.2.0 (#84)
+
+
 0.4.0 (2025-01-17)
 ==================
 
