@@ -1,10 +1,10 @@
 import logging
 import subprocess
 import sys
+from importlib.metadata import PackageNotFoundError, distribution
 from typing import Optional
 
-import pkg_resources
-from pkg_resources import Requirement
+from packaging.requirements import Requirement
 
 logger = logging.getLogger("")
 
@@ -49,10 +49,13 @@ def get_application_from_package(package: str) -> Optional[str]:
     :return: main (first) module name; if ``None``, package is not available in the current virtualenv
     """
     try:
-        distribution = pkg_resources.get_distribution(Requirement.parse(package))
-    except pkg_resources.DistributionNotFound:
+        dist = distribution(Requirement(package).name)
+    except PackageNotFoundError:
+        return
+    top_level = dist.read_text("top_level.txt")
+    if not top_level:
         return
     try:
-        return distribution.get_metadata("top_level.txt").split()[0]
-    except (FileNotFoundError, IndexError):  # pragma: no cover
+        return top_level.split()[0]
+    except IndexError:  # pragma: no cover
         return

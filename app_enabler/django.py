@@ -1,9 +1,9 @@
 import json
 from importlib import import_module
+from importlib.resources import files
 from typing import Any, Dict, Optional
 
 import django.conf
-from pkg_resources import resource_stream
 
 
 def load_addon(module_name: str) -> Optional[Dict[str, Any]]:
@@ -16,7 +16,7 @@ def load_addon(module_name: str) -> Optional[Dict[str, Any]]:
     :return: addon configuration
     """
     try:
-        with resource_stream(module_name, "addon.json") as fp:
+        with files(module_name).joinpath("addon.json").open("rb") as fp:
             data = json.load(fp)
         return data
     except Exception:

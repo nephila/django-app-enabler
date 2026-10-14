@@ -36,11 +36,13 @@ jobs:
         python -m pip install --upgrade pip tox>=3.5
     - name: Test with tox
       env:
-        TOX_ENV: ${{ format('py-django{1}', matrix.python-version, matrix.django) }}
+        PYTHON_VERSION: ${{ matrix.python-version }}
+        DJANGO_VERSION: ${{ matrix.django }}
         PYTEST_ARGS: --cov=app_enabler
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_SERVICE_NAME: github
       run: |
+        TOX_ENV=py${PYTHON_VERSION/./}-django${DJANGO_VERSION}
         tox -e$TOX_ENV
         .tox/$TOX_ENV/bin/coverage xml
     - name: Coveralls Parallel
